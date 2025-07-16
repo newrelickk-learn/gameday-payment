@@ -121,6 +121,6 @@ jobs:
       - name: Deploy to Kubernetes
         run: |
           tag="${{ needs.build.outputs.image-tag }}"
-          sed -i "s/payment-service:latest/payment-service:${tag}/g" deployment.yaml
+          sed -i "s/payment:latest/payment:${tag}/g" deployment.yaml
           sed -i "s/YOUR_NEW_RELIC_LICENSE_KEY/${{ secrets.NEW_RELIC_LICENSE_KEY }}/g" deployment.yaml
           kubectl apply -f deployment.yaml 

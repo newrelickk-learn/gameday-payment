@@ -55,7 +55,7 @@ spec:
               name: payment-service-secrets
         - name: NEW_RELIC_APP_NAME
           value: payment
-        image: public.ecr.aws/g7c8o4c7/payment-service:latest
+        image: public.ecr.aws/g7c8o4c7/payment:latest
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 3
