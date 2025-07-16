@@ -33,20 +33,20 @@ class PaymentService
 
         // simulate=bug でJSONが壊れる
         if ($simulate === 'bug') {
-            return [
+            return array(
                 'broken_json' => true
-            ];
+            );
         }
 
         // 正常系
-        return [
+        return array(
             'status' => 'ok',
             'amount' => $amount,
             'customer_id' => $customer_id,
             'card_id' => $card_id,
             'transaction_id' => uniqid('txn_'),
             'http_code' => 200
-        ];
+        );
     }
 
     // クレジットカード番号のLuhnチェック。リトライ機能付き。
@@ -66,5 +66,4 @@ class PaymentService
     {
         usleep(100000); // 100msスリープ
     }
-} 
-
+}

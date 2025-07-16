@@ -1,10 +1,26 @@
 version: '3.8'
+
 services:
   payment-api:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEW_RELIC_INSTALL_KEY: ${NEW_RELIC_INSTALL_KEY:-980d594b8d4803a0d5a65b0ebe24d4dcc74bNRAL}
     ports:
       - "8080:8080"
     restart: unless-stopped
     environment:
-      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
-      - NEW_RELIC_APP_NAME=ameday-payment 
+      - NEW_RELIC_LICENSE_KEY=980d594b8d4803a0d5a65b0ebe24d4dcc74bNRAL
+      - NEW_RELIC_APP_NAME=local-payment
+      - FUEL_ENV=${FUEL_ENV:-development}
+    volumes:
+      # 開発時にログを確認できるようにマウント
+      - ./fuel/app/logs:/app/fuel/app/logs
+      - ./fuel/app/cache:/app/fuel/app/cache
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s 
