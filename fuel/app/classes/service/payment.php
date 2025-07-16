@@ -14,9 +14,8 @@ class PaymentService
             throw new Exception('Intentional bug: amount 1000 is not allowed.', 500);
         }
 
-        // 特定のcustomer_idでエラー
-        if ($customer_id === 19) {
-            throw new Exception('Invalid customer_id.', 400);
+        if (mt_rand(1, 3) === 1) {
+            throw new Exception('Payment provider did not respond', 500);
         }
 
         // customer_id=43で「クレジットカード番号チェック」風の重い処理
