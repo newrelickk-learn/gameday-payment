@@ -7,7 +7,6 @@ RUN apk add --no-cache git unzip bash ca-certificates wget \
     && composer --version
 
 # New Relic PHPエージェントのインストール
-ARG NEW_RELIC_INSTALL_KEY=0000000000000000000000000000000000000000
 ENV NEW_RELIC_AGENT_VERSION=11.9.0.23
 
 # New Relic PHPエージェントを手動でインストール
