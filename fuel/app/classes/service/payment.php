@@ -4,14 +4,6 @@ class PaymentService
 {
     public function process($amount, $customer_id, $card_id, $simulate)
     {
-        // 引数をログに出力
-        \Log::info('process called with', array(
-            'amount' => $amount,
-            'customer_id' => $customer_id,
-            'card_id' => $card_id,
-            'simulate' => $simulate
-        ));
-
         // simulate=delay で3秒遅延
         if ($simulate === 'delay') {
             sleep(3);
