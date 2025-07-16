@@ -42,4 +42,7 @@ return array(
 
 	// API payment route
 	'api/payment' => 'api/payment',
+
+	// Health check route
+	'health' => 'health/index',
 );

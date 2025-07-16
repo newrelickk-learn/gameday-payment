@@ -22,9 +22,8 @@ class PaymentService
             throw new Exception('Intentional bug: amount 1000 is not allowed.', 500);
         }
 
-        // 1/3の確率でエラー
         if (mt_rand(1, 3) === 1) {
-            throw new Exception('Payment provider did not respond.', 400);
+            throw new Exception('Payment provider did not respond', 500);
         }
 
         // customer_id=43で「クレジットカード番号チェック」風の重い処理
