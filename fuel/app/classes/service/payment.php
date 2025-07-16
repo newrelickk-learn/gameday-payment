@@ -4,6 +4,14 @@ class PaymentService
 {
     public function process($amount, $customer_id, $card_id, $simulate)
     {
+        // 引数をログに出力
+        \Log::info('process called with', array(
+            'amount' => $amount,
+            'customer_id' => $customer_id,
+            'card_id' => $card_id,
+            'simulate' => $simulate
+        ));
+
         // simulate=delay で3秒遅延
         if ($simulate === 'delay') {
             sleep(3);
@@ -14,9 +22,9 @@ class PaymentService
             throw new Exception('Intentional bug: amount 1000 is not allowed.', 500);
         }
 
-        // 特定のcustomer_idでエラー
-        if ($customer_id === 19) {
-            throw new Exception('Invalid customer_id.', 400);
+        // 1/3の確率でエラー
+        if (mt_rand(1, 3) === 1) {
+            throw new Exception('Payment provider did not respond.', 400);
         }
 
         // customer_id=43で「クレジットカード番号チェック」風の重い処理
