@@ -6,12 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        NEW_RELIC_INSTALL_KEY: ${NEW_RELIC_INSTALL_KEY:-980d594b8d4803a0d5a65b0ebe24d4dcc74bNRAL}
+        NEW_RELIC_INSTALL_KEY: ${NEW_RELIC_INSTALL_KEY:-your key}
     ports:
       - "8080:8080"
     restart: unless-stopped
     environment:
-      - NEW_RELIC_LICENSE_KEY=980d594b8d4803a0d5a65b0ebe24d4dcc74bNRAL
+      - NEW_RELIC_LICENSE_KEY=your key
       - NEW_RELIC_APP_NAME=local-payment
       - FUEL_ENV=${FUEL_ENV:-development}
     volumes:
