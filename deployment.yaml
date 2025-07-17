@@ -31,11 +31,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: payment-api
+      name: payment-api
   template:
     metadata:
       labels:
-        app: payment-api
+        name: payment-api
     spec:
       volumes:
         - name: app-shared
@@ -50,17 +50,24 @@ spec:
       containers:
         - name: payment-service
           env:
-          - name: NEW_RELIC_LICENSE_KEY
-            valueFrom:
-              secretKeyRef:
-                key: NEW_RELIC_LICENSE_KEY
-                name: payment-service-secrets
-          - name: NEW_RELIC_APP_NAME
-            value: payment
-          - name: FUEL_ENV
-            value: "production"
+            - name: NEW_RELIC_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: NEW_RELIC_LICENSE_KEY
+                  name: payment-service-secrets
+            - name: NEW_RELIC_APP_NAME
+              value: payment
+            - name: FUEL_ENV
+              value: "production"
           image: public.ecr.aws/g7c8o4c7/payment:latest
           imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
           volumeMounts:
             - name: app-shared
               mountPath: /app
@@ -72,6 +79,13 @@ spec:
           image: nginx:alpine
           ports:
             - containerPort: 80
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
           volumeMounts:
             - name: app-shared
               mountPath: /app/public
@@ -85,7 +99,7 @@ kind: ConfigMap
 metadata:
   name: nginx-config
   labels:
-    app: payment-api
+    name: payment-api
     namespace: catalogue
 data:
   nginx.conf: |
