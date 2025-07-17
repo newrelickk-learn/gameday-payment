@@ -34,6 +34,13 @@ Fuel::$env = Arr::get($_SERVER, 'FUEL_ENV', Arr::get($_ENV, 'FUEL_ENV', getenv('
 // Initialize the framework with the config file.
 \Fuel::init('config.php');
 
+// Monologのセットアップ
+require_once __DIR__ . '/../vendor/autoload.php';
+$monolog = new \Monolog\Logger('fuel');
+$monolog->pushHandler(new \Monolog\Handler\StreamHandler(APPPATH.'logs/monolog.log', \Monolog\Logger::DEBUG));
+// FuelPHPのLoggerをMonologに差し替え
+\Log::instance($monolog);
+
 // New Relic transaction naming
 if (extension_loaded('newrelic')) {
     // Get the current request URI

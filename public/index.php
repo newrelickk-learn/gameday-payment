@@ -171,6 +171,21 @@ try
 	// ... and execute the main request
 	$response = $routerequest();
 }
+catch (Throwable $e)
+{
+	// APIリクエストの場合はJSONでエラー返却
+	$isApi = isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], '/') === 0;
+	if ($isApi) {
+		header('Content-Type: application/json', true, 500);
+		echo json_encode([
+			'error' => $e->getMessage(),
+			'code' => $e->getCode(),
+		]);
+		exit;
+	}
+	// それ以外は従来通り
+	$response = $routerequest('_500_', $e);
+}
 catch (HttpBadRequestException $e)
 {
 	$response = $routerequest('_400_', $e);

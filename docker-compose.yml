@@ -5,20 +5,25 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8081:8080"
-    restart: unless-stopped
-    environment:
-      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY:-your key}
-      - NEW_RELIC_APP_NAME=local-payment
-      - FUEL_ENV=${FUEL_ENV:-development}
     volumes:
-      # 開発時にログを確認できるようにマウント
+      - .:/app
       - ./fuel/app/logs:/app/fuel/app/logs
       - ./fuel/app/cache:/app/fuel/app/cache
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s 
+    expose:
+      - "9000"
+    environment:
+      - FUEL_ENV=${FUEL_ENV:-development}
+      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY:-your key}
+      - NEW_RELIC_APP_NAME=local-payment
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8081:80"
+    volumes:
+      - ./public:/app/public
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - payment-api
+    restart: unless-stopped 

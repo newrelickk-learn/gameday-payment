@@ -6,7 +6,7 @@ metadata:
   namespace: catalogue
 spec:
   selector:
-    name: payment-service
+    name: payment-api
   ports:
     - name: http
       port: 80
@@ -25,77 +25,85 @@ stringData:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    name: payment-service
-  name: payment-service
-  namespace: catalogue
+  name: payment-api
 spec:
-  progressDeadlineSeconds: 600
   replicas: 1
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      name: payment-service
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
+      app: payment-api
   template:
     metadata:
       labels:
-        name: payment-service
+        app: payment-api
     spec:
+      volumes:
+        - name: app-shared
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
+        - name: nginx-conf
+          configMap:
+            name: nginx-config
       containers:
-      - env:
-        - name: NEW_RELIC_LICENSE_KEY
-          valueFrom:
-            secretKeyRef:
-              key: NEW_RELIC_LICENSE_KEY
-              name: payment-service-secrets
-        - name: NEW_RELIC_APP_NAME
-          value: payment
-        image: public.ecr.aws/g7c8o4c7/payment:latest
-        imagePullPolicy: Always
-        livenessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /health
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 3
-          successThreshold: 1
-          timeoutSeconds: 10
-        name: payment-service
-        ports:
-        - containerPort: 8080
-          protocol: TCP
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /health
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 3
-          successThreshold: 1
-          timeoutSeconds: 10
-        resources:
-          limits:
-            cpu: 1
-            memory: 1Gi
-        securityContext:
-          capabilities:
-            add:
-            - NET_BIND_SERVICE
-            drop:
-            - all
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      nodeSelector:
-        beta.kubernetes.io/os: linux
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30 
+        - name: php-fpm
+          image: your-repo/payment-api:latest
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: app-shared
+              mountPath: /app
+            - name: logs
+              mountPath: /app/fuel/app/logs
+            - name: cache
+              mountPath: /app/fuel/app/cache
+          env:
+            - name: FUEL_ENV
+              value: "production"
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: app-shared
+              mountPath: /app/public
+              subPath: public
+            - name: nginx-conf
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  labels:
+    app: payment-api
+data:
+  nginx.conf: |
+    worker_processes 1;
+    events { worker_connections 1024; }
+    http {
+        include       mime.types;
+        default_type  application/octet-stream;
+        sendfile        on;
+        keepalive_timeout  65;
+        server {
+            listen 80;
+            server_name localhost;
+            root /app/public;
+            index index.php index.html;
+            location / {
+                try_files $uri $uri/ /index.php?$query_string;
+            }
+            location ~ \.php$ {
+                fastcgi_pass 127.0.0.1:9000;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME /app/public$fastcgi_script_name;
+                include fastcgi_params;
+            }
+            location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+                expires 1y;
+                log_not_found off;
+            }
+        }
+    }

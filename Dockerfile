@@ -1,5 +1,5 @@
 # PHP公式イメージ（軽量Alpine）
-FROM php:8.2-cli-alpine
+FROM php:8.2-fpm-alpine
 
 # 必要なパッケージとcomposerインストール
 RUN apk add --no-cache git unzip bash ca-certificates wget \
@@ -28,11 +28,12 @@ COPY . /app
 RUN composer install --no-interaction --no-dev --optimize-autoloader && \
     composer update --no-interaction --no-dev --optimize-autoloader
 
-# 8080ポートを開放
-EXPOSE 8080
+# FuelPHPのキャッシュ・ログディレクトリを作成
+RUN mkdir -p /app/fuel/app/logs /app/fuel/app/cache
 
-# run.shに実行権限を付与
-RUN chmod +x run.sh
+# run.shに実行権限を付与（COPYの後に必ず実行）
+RUN chmod +x /app/run.sh
 
-# サーバー起動（run.shを使用）
-CMD ["./run.sh"]
+EXPOSE 9000
+
+CMD ["/app/run.sh"]
