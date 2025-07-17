@@ -8,6 +8,7 @@
 *.tmproj
 build
 .idea
+.env
 nbproject/
 
 # hidden files created by Windows

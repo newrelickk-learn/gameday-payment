@@ -56,6 +56,8 @@ spec:
                 name: payment-service-secrets
           - name: NEW_RELIC_APP_NAME
             value: payment
+          - name: FUEL_ENV
+            value: "production"
           image: public.ecr.aws/g7c8o4c7/payment:latest
           imagePullPolicy: Always
           volumeMounts:
@@ -65,9 +67,6 @@ spec:
               mountPath: /app/fuel/app/logs
             - name: cache
               mountPath: /app/fuel/app/cache
-          env:
-            - name: FUEL_ENV
-              value: "production"
         - name: nginx
           image: nginx:alpine
           ports:
