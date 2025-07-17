@@ -47,9 +47,17 @@ spec:
           configMap:
             name: nginx-config
       containers:
-        - name: php-fpm
-          image: your-repo/payment-api:latest
-          imagePullPolicy: IfNotPresent
+        - name: payment-service
+          env:
+          - name: NEW_RELIC_LICENSE_KEY
+            valueFrom:
+              secretKeyRef:
+                key: NEW_RELIC_LICENSE_KEY
+                name: payment-service-secrets
+          - name: NEW_RELIC_APP_NAME
+            value: payment
+        image: public.ecr.aws/g7c8o4c7/payment:latest
+        imagePullPolicy: Always
           volumeMounts:
             - name: app-shared
               mountPath: /app
