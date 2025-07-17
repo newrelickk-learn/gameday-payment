@@ -62,15 +62,10 @@ spec:
           image: public.ecr.aws/g7c8o4c7/payment:latest
           imagePullPolicy: Always
           resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
             limits:
               memory: "512Mi"
               cpu: "500m"
           volumeMounts:
-            - name: app-shared
-              mountPath: /app
             - name: logs
               mountPath: /app/fuel/app/logs
             - name: cache
@@ -112,7 +107,7 @@ data:
         keepalive_timeout  65;
         server {
             listen 80;
-            server_name localhost;
+            server_name localhost payment;
             root /app/public;
             index index.php index.html;
             location / {
