@@ -1,5 +1,5 @@
 # PHP公式イメージ（軽量Alpine）
-FROM php:8.2-fpm-alpine
+FROM php:8.0-fpm-alpine
 
 # 必要なパッケージとcomposerインストール
 RUN apk add --no-cache git unzip bash ca-certificates wget \
@@ -25,8 +25,7 @@ WORKDIR /app
 COPY . /app
 
 # FuelPHPのセットアップとComposer依存関係のインストール
-RUN composer install --no-interaction --no-dev --optimize-autoloader && \
-    composer update --no-interaction --no-dev --optimize-autoloader
+RUN composer install --no-interaction --no-dev --optimize-autoloader
 
 # FuelPHPのキャッシュ・ログディレクトリを作成
 RUN mkdir -p /app/fuel/app/logs /app/fuel/app/cache
