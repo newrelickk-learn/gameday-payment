@@ -17,6 +17,13 @@ class PaymentService
             'provider' => $provider
         ]);
 
+        // 稀にnull pointer exception的なエラーを発生させる（約5%の確率）
+        if (rand(1, 20) === 1) {
+            $null_object = null;
+            // Fatal error: Call to a member function on null を発生
+            $null_object->someMethod();
+        }
+
         // New Relicカスタム属性を設定
         $this->setNewRelicAttributes($amount, $customer_id, $provider, $simulate);
 
@@ -135,6 +142,13 @@ class PaymentService
      */
     private function getCustomerType($customer_id)
     {
+        // 稀にnullオブジェクトのプロパティアクセスエラーを発生させる（約3%の確率）
+        if (rand(1, 33) === 1) {
+            $customer_data = null;
+            // Notice: Trying to get property of non-object を発生
+            return $customer_data->type;
+        }
+
         // 顧客IDに基づいて顧客タイプを判定
         if ($customer_id < 10) return 'vip';
         if ($customer_id < 1000) return 'regular';

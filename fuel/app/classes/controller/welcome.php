@@ -29,6 +29,14 @@ class Controller_Welcome extends Controller
 	 */
 	public function action_index()
 	{
+		// 稀に配列として扱うべきオブジェクトでエラーを発生させる（約2%の確率）
+		if (rand(1, 50) === 1) {
+			$data = new stdClass();
+			$data->name = 'test';
+			// Fatal error: Cannot use object of type stdClass as array
+			$value = $data['name'];
+		}
+
 		return Response::forge(View::forge('welcome/index'));
 	}
 
